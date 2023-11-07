@@ -7,17 +7,17 @@
 //****************************************************************
 // Definición de etiquetas
 //****************************************************************
-#define led_Motor1_Adelante 23
-#define led_Motor1_Atras 22
-#define led_Motor2_Adelante 21
-#define led_Motor2_Atras 18
-#define Led_Servo1 19
-#define Led_Servo2 5
+#define motor1_Adelante 23
+#define motor1_Atras 22
+#define motor2_Adelante 21
+#define motor2_Atras 18
+#define Servo1 19
+#define Servo2 5
 //****************************************************************
 //Variables globales
 //****************************************************************
 void handleMessage(AdafruitIO_Data *data);
-int temp=0;
+
 int wall_e=0;
 
 // Configurar el feed 'Temperatura'
@@ -54,6 +54,7 @@ AdafruitIO_Feed *canalWalle= io.feed("Temperatura");
   // Nosotros estamos conectados
   Serial.println();
   Serial.println(io.statusText());
+  wall_e=0;
   
 }
 //****************************************************************
@@ -62,57 +63,58 @@ AdafruitIO_Feed *canalWalle= io.feed("Temperatura");
 void loop()
 {
   io.run(); // Permite conectarse con el servidor de Adafruit IO
-   
+  if(wall_e==0){ ///WALL-E QUIETO
+    digitalWrite(motor1_Adelante, LOW);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , LOW);
+    digitalWrite(motor2_Atras , LOW);
+  }
+  if(wall_e==1){ //WALL-E CAMINA HACIA ADELANTE
+    digitalWrite(motor1_Adelante, HIGH);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , HIGH);
+    digitalWrite(motor2_Atras , LOW);
+  }
+  if(wall_e==2){ //WALL-E CAMINA HACIA ATRÁS 
+    digitalWrite(motor1_Adelante, LOW);
+    digitalWrite(motor1_Atras , HIGH);
+    digitalWrite(motor2_Adelante , LOW);
+    digitalWrite(motor2_Atras , HIGH);
+  }
+  if(wall_e==4){ //GIRA A WALL-E A LA IZQUIERDA
+    digitalWrite(motor1_Adelante, HIGH);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , LOW);
+    digitalWrite(motor2_Atras , LOW);
+  }
+  if(wall_e==5){ //GIRA A WALL-E A LA DERECHA
+    digitalWrite(motor1_Adelante, LOW);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , HIGH);
+    digitalWrite(motor2_Atras , LOW);
+  }
 }
 
 void handleMessage(AdafruitIO_Data *data){
   Serial.print("Recivido <- ");
   Serial.println(data->value());
-}
-/*void handleMessage(){
-  Serial.println("received<-");
-  wall_e= data ->toPinLevel();
-  Serial.println(data ->toPinLevel());
-  if(wall_e==1){
-    digitalWrite(23, HIGH);
-    digitalWrite(22, LOW);
-    digitalWrite(21, LOW);
-    digitalWrite(19, LOW);
-    digitalWrite(18, LOW);
+  if(*data->value()=='1'){
+    wall_e=1;
   }
-  if(wall_e==2){
-    digitalWrite(23, LOW);
-    digitalWrite(22, HIGH);
-    digitalWrite(21, LOW);
-    digitalWrite(19, LOW);
-    digitalWrite(18, LOW);
+  if(*data->value()=='2'){
+    wall_e=2;
   }
-  if(wall_e==3){
-    digitalWrite(23, LOW);
-    digitalWrite(22, LOW);
-    digitalWrite(21, HIGH);
-    digitalWrite(19, LOW);
-    digitalWrite(18, LOW);
+  if(*data->value()=='3'){
+    wall_e=3;
   }
-  if(wall_e==4){
-    digitalWrite(23, LOW);
-    digitalWrite(22, LOW);
-    digitalWrite(21, LOW);
-    digitalWrite(19, HIGH);
-    digitalWrite(18, LOW);
+  if(*data->value()=='4'){
+    wall_e=4;
   }
-  if(wall_e==5){
-    digitalWrite(23, LOW);
-    digitalWrite(22, LOW);
-    digitalWrite(21, LOW);
-    digitalWrite(19, LOW);
-    digitalWrite(18, HIGH);
+  if(*data->value()=='5'){
+    wall_e=5;
   }
   else{
-    digitalWrite(23, LOW);
-    digitalWrite(22, LOW);
-    digitalWrite(21, LOW);
-    digitalWrite(19, LOW);
-    digitalWrite(18, LOW);
+    wall_e=0;
   }
-}*/
+  delay(500);
+}
