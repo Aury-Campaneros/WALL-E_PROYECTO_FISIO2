@@ -33,6 +33,7 @@ AdafruitIO_Feed *canalWalle= io.feed("Temperatura");
    pinMode(21, OUTPUT);
    pinMode(19, OUTPUT);
    pinMode(18, OUTPUT);
+   pinMode(5, OUTPUT);
 
   // Esperamos que abra el monitor serial
   while (!Serial)
@@ -54,8 +55,6 @@ AdafruitIO_Feed *canalWalle= io.feed("Temperatura");
   // Nosotros estamos conectados
   Serial.println();
   Serial.println(io.statusText());
-  wall_e=0;
-  
 }
 //****************************************************************
 //Loop Principal
@@ -63,36 +62,7 @@ AdafruitIO_Feed *canalWalle= io.feed("Temperatura");
 void loop()
 {
   io.run(); // Permite conectarse con el servidor de Adafruit IO
-  if(wall_e==0){ ///WALL-E QUIETO
-    digitalWrite(motor1_Adelante, LOW);
-    digitalWrite(motor1_Atras , LOW);
-    digitalWrite(motor2_Adelante , LOW);
-    digitalWrite(motor2_Atras , LOW);
-  }
-  if(wall_e==1){ //WALL-E CAMINA HACIA ADELANTE
-    digitalWrite(motor1_Adelante, HIGH);
-    digitalWrite(motor1_Atras , LOW);
-    digitalWrite(motor2_Adelante , HIGH);
-    digitalWrite(motor2_Atras , LOW);
-  }
-  if(wall_e==2){ //WALL-E CAMINA HACIA ATRÁS 
-    digitalWrite(motor1_Adelante, LOW);
-    digitalWrite(motor1_Atras , HIGH);
-    digitalWrite(motor2_Adelante , LOW);
-    digitalWrite(motor2_Atras , HIGH);
-  }
-  if(wall_e==4){ //GIRA A WALL-E A LA IZQUIERDA
-    digitalWrite(motor1_Adelante, HIGH);
-    digitalWrite(motor1_Atras , LOW);
-    digitalWrite(motor2_Adelante , LOW);
-    digitalWrite(motor2_Atras , LOW);
-  }
-  if(wall_e==5){ //GIRA A WALL-E A LA DERECHA
-    digitalWrite(motor1_Adelante, LOW);
-    digitalWrite(motor1_Atras , LOW);
-    digitalWrite(motor2_Adelante , HIGH);
-    digitalWrite(motor2_Atras , LOW);
-  }
+  void handleMessage(AdafruitIO_Data *data);
 }
 
 void handleMessage(AdafruitIO_Data *data){
@@ -100,21 +70,60 @@ void handleMessage(AdafruitIO_Data *data){
   Serial.println(data->value());
   if(*data->value()=='1'){
     wall_e=1;
+    Serial.println("adelante");
+    digitalWrite(motor1_Adelante, HIGH);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , HIGH);
+    digitalWrite(motor2_Atras , LOW);
+    digitalWrite(Servo1 , LOW);
+    digitalWrite(Servo2 , LOW);
   }
   if(*data->value()=='2'){
     wall_e=2;
+    Serial.println("atrás");
+    digitalWrite(motor1_Adelante, LOW);
+    digitalWrite(motor1_Atras , HIGH);
+    digitalWrite(motor2_Adelante , LOW);
+    digitalWrite(motor2_Atras , HIGH);
+    digitalWrite(Servo1 , LOW);
+    digitalWrite(Servo2 , LOW);
   }
   if(*data->value()=='3'){
-    wall_e=3;
+    Serial.println("Servos");
+    digitalWrite(Servo1 , HIGH);
+    digitalWrite(Servo2 , HIGH);
+    digitalWrite(motor1_Adelante, LOW);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , LOW);
+    digitalWrite(motor2_Atras , LOW);
+
   }
   if(*data->value()=='4'){
-    wall_e=4;
+    Serial.println("izquierda");
+    digitalWrite(motor1_Adelante, HIGH);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , LOW);
+    digitalWrite(motor2_Atras , LOW);
+    digitalWrite(Servo1 , LOW);
+    digitalWrite(Servo2 , LOW);
   }
   if(*data->value()=='5'){
-    wall_e=5;
+    Serial.println("derecha");
+    digitalWrite(motor1_Adelante, LOW);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , HIGH);
+    digitalWrite(motor2_Atras , LOW);
+    digitalWrite(Servo1 , LOW);
+    digitalWrite(Servo2 , LOW);
   }
-  else{
-    wall_e=0;
+  if(*data->value()=='0'){
+    Serial.println("quieto");
+    digitalWrite(motor1_Adelante, LOW);
+    digitalWrite(motor1_Atras , LOW);
+    digitalWrite(motor2_Adelante , LOW);
+    digitalWrite(motor2_Atras , LOW);
+    digitalWrite(Servo1 , LOW);
+    digitalWrite(Servo2 , LOW);
   }
   delay(500);
 }
