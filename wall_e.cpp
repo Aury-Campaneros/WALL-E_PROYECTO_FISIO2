@@ -13,12 +13,30 @@
 #define led_Motor2_Atras 18
 #define Led_Servo1 19
 #define Led_Servo2 5*/
+
 //****************************************************************
 //Variables globales
 //****************************************************************
 int temp=0;
 // Configurar el feed 'Temperatura'
 AdafruitIO_Feed *tempCanal = io.feed("Temperatura");
+
+// interrupciones
+//****************************************************************
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+void IRAM_ATTR handlerBTN1ISR()
+{
+portENTER_CRITICAL_ISR(&mux);
+  temp=0;
+  Serial.print("Enviando -> ");
+  Serial.println(temp);
+  tempCanal->save(temp);
+  Serial.printf(" señal %f \n", temp);
+portEXIT_CRITICAL_ISR(&mux);
+delay(1000);
+}
+//****************************************************************
+
 //****************************************************************
 //Configuración
 //****************************************************************
@@ -59,6 +77,11 @@ AdafruitIO_Feed *tempCanal = io.feed("Temperatura");
   pinMode(21, INPUT); //Entrada Digital del cuello
   pinMode(19, INPUT); //Entrada Digital del ojo derecho
   pinMode(18, INPUT); //Entrada Digital del ojo izquierdo
+  attachInterrupt(23, handlerBTN1ISR, FALLING);
+  attachInterrupt(22, handlerBTN1ISR, FALLING);
+  attachInterrupt(21, handlerBTN1ISR, FALLING);
+  attachInterrupt(19, handlerBTN1ISR, FALLING);
+  attachInterrupt(18, handlerBTN1ISR, FALLING);
 }
 //****************************************************************
 //Loop Principal
@@ -71,7 +94,7 @@ void loop()
   volatile int emg_Cuello=digitalRead(21);   //lectura del cambio de estado de la entrada digiral del cuello
   volatile int eog_Izquierda=digitalRead(19); //lectura del cambio de estado de la entrada digiral del ojo izquierda
   volatile int eog_Derecha=digitalRead(18); //lectura del cambio de estado de la entrada digiral del ojo derecho
-
+  temp=0;
 //Iniciación de las salidas en cero
   /*digitalWrite(led_Motor1_Adelante, LOW);
   digitalWrite(led_Motor1_Atras, LOW);
@@ -88,12 +111,6 @@ void loop()
     Serial.println(temp);
     tempCanal->save(temp);
     Serial.printf(" señal %d \n", temp);
-    /*digitalWrite(led_Motor1_Adelante, HIGH);
-    digitalWrite(led_Motor1_Atras, LOW);
-    digitalWrite(led_Motor2_Adelante, HIGH);
-    digitalWrite(led_Motor2_Atras, LOW);
-    digitalWrite(Led_Servo1, LOW);
-    digitalWrite(Led_Servo2, LOW);*/
   }
   if(emg_BrazoD==0 && emg_BrazoI==1 && emg_Cuello==0 && eog_Izquierda==0 && eog_Derecha==0 ){
     //WALL-E CAMINA HACIA ATRÁS
@@ -102,12 +119,6 @@ void loop()
     Serial.println(temp);
     tempCanal->save(temp);
     Serial.printf(" señal %f \n", temp);
-    /*digitalWrite(led_Motor1_Adelante, LOW);
-    digitalWrite(led_Motor1_Atras, HIGH);
-    digitalWrite(led_Motor2_Adelante, LOW);
-    digitalWrite(led_Motor2_Atras, HIGH);
-    digitalWrite(Led_Servo1, LOW);
-    digitalWrite(Led_Servo2, LOW);*/
   }
    if(emg_BrazoD==0 && emg_BrazoI==0 && emg_Cuello==1 && eog_Izquierda==0 && eog_Derecha==0 ){
     //MUEVE LOS BRAZOS DE WALL-E
@@ -116,12 +127,6 @@ void loop()
     Serial.println(temp);
     tempCanal->save(temp);
     Serial.printf(" señal %f \n", temp);
-    /*digitalWrite(led_Motor1_Adelante, LOW);
-    digitalWrite(led_Motor1_Atras, LOW);
-    digitalWrite(led_Motor2_Adelante, LOW);
-    digitalWrite(led_Motor2_Atras, LOW);
-    digitalWrite(Led_Servo1, HIGH);
-    digitalWrite(Led_Servo2, HIGH);*/
   }
 
   if(emg_BrazoD==0 && emg_BrazoI==0 && emg_Cuello==0 && eog_Izquierda==1 && eog_Derecha==0 ){
@@ -131,12 +136,6 @@ void loop()
     Serial.println(temp);
     tempCanal->save(temp);
     Serial.printf(" señal %f \n", temp);
-    /*digitalWrite(led_Motor1_Adelante, HIGH);
-    digitalWrite(led_Motor1_Atras, LOW);
-    digitalWrite(led_Motor2_Adelante, LOW);
-    digitalWrite(led_Motor2_Atras, LOW);
-    digitalWrite(Led_Servo1, LOW);
-    digitalWrite(Led_Servo2, LOW);*/
   }
   if(emg_BrazoD==0 && emg_BrazoI==0 && emg_Cuello==0 && eog_Izquierda==0 && eog_Derecha==1 ){
     //GIRA A WALL-E A LA DERECHA
@@ -145,18 +144,14 @@ void loop()
     Serial.println(temp);
     tempCanal->save(temp);
     Serial.printf(" señal %f \n", temp);
-    /*digitalWrite(led_Motor1_Adelante, LOW);
-    digitalWrite(led_Motor1_Atras, LOW);
-    digitalWrite(led_Motor2_Adelante, HIGH);
-    digitalWrite(led_Motor2_Atras, LOW);
-    digitalWrite(Led_Servo1, LOW);
-    digitalWrite(Led_Servo2, LOW);*/
   }
-  else{
+  /*if(emg_BrazoD==0 && emg_BrazoI==0 && emg_Cuello==0 && eog_Izquierda==0 && eog_Derecha==0 ){
+    //Wall_e quieto
     temp=0;
-  }
-  /***************************** ESP32 WIFI  ************************************/
-    // guardar el recuento en el feed 'Temperatura' de Adafruit IO
-     // guardar el recuento en el feed 'Temperatura' de Adafruit IO
-    
+    Serial.print("Enviando -> ");
+    Serial.println(temp);
+    tempCanal->save(temp);
+    Serial.printf(" señal %f \n", temp);
+    delay(1000);
+  }*/
 }
